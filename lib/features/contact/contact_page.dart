@@ -113,7 +113,7 @@ class _GalleryThumb extends StatelessWidget {
         height: 72,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.surfaceVariant,
+          color: theme.colorScheme.surfaceContainerHighest,
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover),
         ),
       ),

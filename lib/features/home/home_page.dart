@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage>
             fontWeight: FontWeight.w800,
             letterSpacing: 1.2,
             height: 1.05,
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
           ),
         ),
 
@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage>
           textAlign: center ? TextAlign.center : TextAlign.left,
           style: theme.textTheme.bodyLarge?.copyWith(
             fontSize: 12,
-            color: theme.colorScheme.onBackground.withOpacity(
+            color: theme.colorScheme.onSurface.withOpacity(
               theme.brightness == Brightness.dark ? 0.85 : 0.75,
             ),
             height: 1.6,
@@ -377,7 +377,7 @@ class _GlowIconButtonState extends State<_GlowIconButton> {
               shape: BoxShape.circle,
               color: Theme.of(
                 context,
-              ).colorScheme.surfaceVariant.withOpacity(0.6),
+              ).colorScheme.surfaceContainerHighest.withOpacity(0.6),
               boxShadow: _hovered
                   ? [
                       BoxShadow(
@@ -493,7 +493,7 @@ class _HoverCardState extends State<_HoverCard> {
         transform: Matrix4.identity()..translate(0.0, _hovered ? -10.0 : 0.0),
         decoration: BoxDecoration(
           color: _hovered
-              ? theme.colorScheme.surfaceVariant.withOpacity(0.85)
+              ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.85)
               : Colors.transparent,
 
           borderRadius: BorderRadius.circular(16),
@@ -582,7 +582,7 @@ class _Feature extends StatelessWidget {
                 title.toUpperCase(),
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 6),
@@ -660,7 +660,7 @@ class _StatState extends State<_Stat> with SingleTickerProviderStateMixin {
               "${_animation.value.toInt()}$_suffix",
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: theme.colorScheme.onBackground,
+                color: theme.colorScheme.onSurface,
               ),
             ),
 
@@ -670,7 +670,7 @@ class _StatState extends State<_Stat> with SingleTickerProviderStateMixin {
             Text(
               widget.label,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onBackground.withOpacity(
+                color: theme.colorScheme.onSurface.withOpacity(
                   theme.brightness == Brightness.dark ? 0.75 : 0.65,
                 ),
               ),
