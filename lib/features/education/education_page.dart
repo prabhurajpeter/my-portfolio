@@ -16,7 +16,9 @@ class EducationPage extends StatelessWidget {
           const SectionTitle("Education"),
           const SizedBox(height: 36),
 
-          isMobile ? _mobileLayout(context) : _desktopLayout(context),
+          Expanded(
+            child: isMobile ? const _MobileEducation() : _desktopLayout(),
+          ),
         ],
       ),
     );
@@ -24,31 +26,149 @@ class EducationPage extends StatelessWidget {
 
   // ================= DESKTOP =================
 
-  Widget _desktopLayout(BuildContext context) {
+  Widget _desktopLayout() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: const [
         Expanded(
           child: _TimelineColumn(title: "College", items: collegeEducation),
         ),
-        const SizedBox(width: 60),
+        SizedBox(width: 60),
         Expanded(
           child: _TimelineColumn(title: "School", items: schoolEducation),
         ),
       ],
     );
   }
+}
 
-  // ================= MOBILE =================
+// ================= MOBILE =================
 
-  Widget _mobileLayout(BuildContext context) {
+class _MobileEducation extends StatefulWidget {
+  const _MobileEducation();
+
+  @override
+  State<_MobileEducation> createState() => _MobileEducationState();
+}
+
+class _MobileEducationState extends State<_MobileEducation> {
+  late bool showCollege;
+  late bool showSchool;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // ✅ FIRST TILE OPEN BY DEFAULT
+    showCollege = true;
+    showSchool = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _TimelineColumn(title: "College", items: collegeEducation),
-        const SizedBox(height: 48),
-        _TimelineColumn(title: "School", items: schoolEducation),
+        _ExpansionTileCard(
+          title: "College",
+          expanded: showCollege,
+          onTap: () {
+            setState(() {
+              showCollege = true;
+              showSchool = false;
+            });
+          },
+        ),
+
+        if (showCollege)
+          const Padding(
+            padding: EdgeInsets.only(left: 8, top: 16),
+            child: _TimelineColumn(
+              title: "College",
+              items: collegeEducation,
+              showTitle: false,
+            ),
+          ),
+
+        const SizedBox(height: 28),
+
+        _ExpansionTileCard(
+          title: "School",
+          expanded: showSchool,
+          onTap: () {
+            setState(() {
+              showSchool = true;
+              showCollege = false;
+            });
+          },
+        ),
+
+        if (showSchool)
+          const Padding(
+            padding: EdgeInsets.only(left: 8, top: 16),
+            child: _TimelineColumn(
+              title: "School",
+              items: schoolEducation,
+              showTitle: false,
+            ),
+          ),
       ],
+    );
+  }
+}
+
+// ================= EXPANSION TILE CARD =================
+
+class _ExpansionTileCard extends StatelessWidget {
+  final String title;
+  final bool expanded;
+  final VoidCallback onTap;
+
+  const _ExpansionTileCard({
+    required this.title,
+    required this.expanded,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: expanded
+              ? theme.colorScheme.primary.withOpacity(0.08)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: expanded
+                ? theme.colorScheme.primary.withOpacity(0.4)
+                : theme.colorScheme.outline.withOpacity(0.2),
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              title.toUpperCase(),
+              style: theme.textTheme.labelLarge?.copyWith(
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const Spacer(),
+            Icon(
+              expanded
+                  ? Icons.keyboard_arrow_up_rounded
+                  : Icons.keyboard_arrow_down_rounded,
+              color: theme.colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -58,8 +178,13 @@ class EducationPage extends StatelessWidget {
 class _TimelineColumn extends StatelessWidget {
   final String title;
   final List<EducationModel> items;
+  final bool showTitle;
 
-  const _TimelineColumn({required this.title, required this.items});
+  const _TimelineColumn({
+    required this.title,
+    required this.items,
+    this.showTitle = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,16 +193,17 @@ class _TimelineColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title.toUpperCase(),
-          style: theme.textTheme.labelLarge?.copyWith(
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-            color: theme.colorScheme.primary,
+        if (showTitle) ...[
+          Text(
+            title.toUpperCase(),
+            style: theme.textTheme.labelLarge?.copyWith(
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.primary,
+            ),
           ),
-        ),
-
-        const SizedBox(height: 28),
+          const SizedBox(height: 28),
+        ],
 
         ...List.generate(
           items.length,
@@ -104,25 +230,21 @@ class _TimelineItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 🟦 TIMELINE (FIXED HEIGHT)
         SizedBox(
           width: 20,
-          height: isLast ? 20 : 72, // 👈 IMPORTANT
+          height: isLast ? 20 : 72,
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
-              // LINE
               if (!isLast)
                 Positioned(
-                  top: 10, // center of dot
+                  top: 10,
                   child: Container(
                     width: 2,
                     height: 62,
                     color: theme.colorScheme.primary.withOpacity(0.35),
                   ),
                 ),
-
-              // DOT
               Container(
                 width: 12,
                 height: 12,
@@ -134,10 +256,7 @@ class _TimelineItem extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(width: 18),
-
-        // 📘 CONTENT
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 32),
@@ -148,11 +267,11 @@ class _TimelineItem extends StatelessWidget {
                   education.degree,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
 
                 const SizedBox(height: 6),
-
                 Text(
                   education.institution,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -160,9 +279,7 @@ class _TimelineItem extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Wrap(
                   spacing: 14,
                   runSpacing: 6,
@@ -243,7 +360,6 @@ class EducationModel {
 
 // ================= DATA =================
 
-// 🎓 COLLEGE
 const collegeEducation = [
   EducationModel(
     degree: "M.Sc. Network Technology & Information Technology",
@@ -259,7 +375,6 @@ const collegeEducation = [
   ),
 ];
 
-// 🏫 SCHOOL
 const schoolEducation = [
   EducationModel(
     degree: "Higher Secondary Certificate (HSC)",

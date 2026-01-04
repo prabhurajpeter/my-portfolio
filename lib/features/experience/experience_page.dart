@@ -8,7 +8,7 @@ class ExperiencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
@@ -19,47 +19,13 @@ class ExperiencePage extends StatelessWidget {
           const SizedBox(height: 40),
 
           Center(
-            child: SizedBox(
-              width: 900, // 🔥 CONSTRAIN WIDTH (KEY FIX)
-              height: 340,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // ───── TIMELINE LINE ─────
-                  Positioned(
-                    top: 170,
-                    left: 80,
-                    right: 80,
-                    child: Container(
-                      height: 2,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-
-                  // ───── MAIN ROW ─────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _ExperienceNode(
-                        experience: experienceData[0],
-                        isActive: true,
-                      ),
-
-                      // ⭐ CENTER CONTENT (NEW)
-                      _TimelineCenter(theme: theme),
-
-                      _ExperienceNode(
-                        experience: experienceData[1],
-                        isActive: false,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            child: isMobile
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: _TimelineContent(theme: theme),
+                  )
+                : const _TimelineContent(),
           ),
         ],
       ),
@@ -67,6 +33,58 @@ class ExperiencePage extends StatelessWidget {
   }
 }
 
+/// ─────────────────────────────────────────────
+/// TIMELINE CONTENT
+/// ─────────────────────────────────────────────
+class _TimelineContent extends StatelessWidget {
+  final ThemeData? theme;
+
+  const _TimelineContent({this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = theme ?? Theme.of(context);
+
+    return SizedBox(
+      width: 900, // 🔥 fixed width enables horizontal scroll on mobile
+      height: 340,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // ───── TIMELINE LINE ─────
+          Positioned(
+            top: 170,
+            left: 80,
+            right: 80,
+            child: Container(
+              height: 2,
+              decoration: BoxDecoration(
+                color: t.colorScheme.primary.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+
+          // ───── MAIN ROW ─────
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _ExperienceNode(experience: experienceData[0], isActive: true),
+
+              _TimelineCenter(theme: t),
+
+              _ExperienceNode(experience: experienceData[1], isActive: false),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// ─────────────────────────────────────────────
+/// CENTER LABEL
+/// ─────────────────────────────────────────────
 class _TimelineCenter extends StatelessWidget {
   final ThemeData theme;
 
@@ -82,8 +100,10 @@ class _TimelineCenter extends StatelessWidget {
           "Career Journey",
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurface,
           ),
         ),
+
         const SizedBox(height: 6),
         Text(
           "2+ Years Experience",
@@ -96,6 +116,9 @@ class _TimelineCenter extends StatelessWidget {
   }
 }
 
+/// ─────────────────────────────────────────────
+/// EXPERIENCE NODE
+/// ─────────────────────────────────────────────
 class _ExperienceNode extends StatefulWidget {
   final ExperienceModel experience;
   final bool isActive;
@@ -163,25 +186,20 @@ class _ExperienceNodeState extends State<_ExperienceNode> {
             child: GlassCard(
               child: SizedBox(
                 width: 230,
-                height: 250, // 🔥 FIXED HEIGHT, NO EXPAND
+                height: 250,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // COMPANY NAME (FIXED COLOR)
                       Text(
                         widget.experience.company,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color:
-                              theme.colorScheme.onSurface, // ✅ DARK/LIGHT SAFE
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
-
                       const SizedBox(height: 6),
-
-                      // ROLE (ACCENT)
                       Text(
                         widget.experience.role,
                         style: theme.textTheme.labelMedium?.copyWith(
@@ -189,20 +207,14 @@ class _ExperienceNodeState extends State<_ExperienceNode> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
-                      // LOCATION
                       Text(
                         widget.experience.location,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface.withOpacity(0.65),
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
-                      // HIGHLIGHTS (ALWAYS VISIBLE)
                       ...widget.experience.highlights.map(
                         (e) => Padding(
                           padding: const EdgeInsets.only(bottom: 6),
@@ -229,6 +241,9 @@ class _ExperienceNodeState extends State<_ExperienceNode> {
   }
 }
 
+/// ─────────────────────────────────────────────
+/// MODEL
+/// ─────────────────────────────────────────────
 class ExperienceModel {
   final String company;
   final String role;
@@ -247,6 +262,9 @@ class ExperienceModel {
   });
 }
 
+/// ─────────────────────────────────────────────
+/// DATA
+/// ─────────────────────────────────────────────
 const experienceData = [
   ExperienceModel(
     company: "Zaaroz Pvt Ltd",

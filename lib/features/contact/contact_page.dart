@@ -8,35 +8,37 @@ class ContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final width = MediaQuery.of(context).size.width;
+
+    final isDesktop = width > 900;
+    final isMobile = width < 600;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
+      padding: EdgeInsets.symmetric(
+        horizontal: 28,
+        vertical: isMobile ? 32 : 48,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SectionTitle("Contact"),
-          const SizedBox(height: 40),
+          SizedBox(height: isMobile ? 24 : 40),
 
-          isDesktop
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: _LeftBlock(theme)),
-                    const SizedBox(width: 40),
-                    _Divider(theme),
-                    const SizedBox(width: 40),
-                    Expanded(child: _RightBlock(theme)),
-                  ],
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _LeftBlock(theme),
-                    const SizedBox(height: 32),
-                    _RightBlock(theme),
-                  ],
-                ),
+          // 🖥️ DESKTOP → LEFT + RIGHT
+          if (isDesktop)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _LeftBlock(theme)),
+                const SizedBox(width: 40),
+                _Divider(theme),
+                const SizedBox(width: 40),
+                Expanded(child: _RightBlock(theme)),
+              ],
+            )
+          // 📱 MOBILE → LEFT ONLY
+          else
+            _LeftBlock(theme),
         ],
       ),
     );
@@ -245,7 +247,7 @@ class _RightBlock extends StatelessWidget {
         _InfoRow(
           icon: Icons.email_outlined,
           title: "Email",
-          value: "yourmail@email.com",
+          value: "prabhurajpeter@email.com",
           isLink: true,
         ),
         const SizedBox(height: 28),

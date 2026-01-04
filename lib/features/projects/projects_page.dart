@@ -156,8 +156,8 @@ class ProjectCard extends StatelessWidget {
               child: Image.asset(
                 project.image,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: theme.colorScheme.surfaceVariant,
+                errorBuilder: (_, _, _) => Container(
+                  color: theme.colorScheme.surfaceContainerHighest,
                   child: Icon(
                     Icons.image_not_supported,
                     size: 28,
@@ -284,7 +284,8 @@ const projectData = [
     title: "Hospital Management System",
     description:
         "Production-ready hospital ERP system for managing patients, billing, and workflows.",
-    image: "assets/projects/hospital.png",
+    image:
+        "https://acropolium.com/blog/how-to-choose-the-best-hospital-management-software-for-healthcare-business/",
     tech: ["Flutter", "BLoC", "REST API", "Firebase"],
   ),
   ProjectModel(

@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:protfolio/widgets/section_title.dart';
 import 'package:protfolio/widgets/skill_chip.dart';
@@ -11,7 +10,7 @@ class SkillsPage extends StatelessWidget {
     final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1200),
@@ -21,21 +20,32 @@ class SkillsPage extends StatelessWidget {
     );
   }
 
+  // ================= DESKTOP =================
+
   Widget _desktopLayout() {
     return const Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(flex: 4, child: _SkillsIntro()),
-        SizedBox(width: 56),
-        Expanded(flex: 6, child: _SkillCards()),
+        Expanded(flex: 5, child: _SkillsIntro()),
+        SizedBox(width: 64),
+        Expanded(flex: 5, child: _SkillCards()),
       ],
     );
   }
 
+  // ================= MOBILE =================
+
   Widget _mobileLayout() {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [_SkillsIntro(), SizedBox(height: 48), _SkillCards()],
+      children: [
+        _SkillsIntro(),
+        SizedBox(height: 24),
+        Expanded(
+          // 🔑 FIX: cards take remaining height
+          child: _SkillCards(),
+        ),
+      ],
     );
   }
 }
@@ -51,10 +61,10 @@ class _SkillsIntro extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min, // 🔑 IMPORTANT
       children: [
         const SectionTitle("Skills & Tools"),
-        const SizedBox(height: 28),
-
+        const SizedBox(height: 24),
         Text(
           "I specialize in Flutter development with a strong focus on "
           "clean architecture, performance, and scalable systems.\n\n"
@@ -65,12 +75,10 @@ class _SkillsIntro extends StatelessWidget {
             color: theme.colorScheme.onSurface.withOpacity(0.85),
           ),
         ),
-
-        const SizedBox(height: 36),
-
+        const SizedBox(height: 24),
         Container(
           height: 3,
-          width: 120,
+          width: 140,
           decoration: BoxDecoration(
             color: theme.colorScheme.primary,
             borderRadius: BorderRadius.circular(2),
@@ -91,11 +99,11 @@ class _SkillCards extends StatefulWidget {
 }
 
 class _SkillCardsState extends State<_SkillCards> {
-  final PageController _controller = PageController(viewportFraction: 0.7);
+  late PageController _controller;
   int _currentIndex = 0;
 
   final _cards = const [
-    const _SkillCard(
+    _SkillCard(
       icon: Icons.flutter_dash,
       title: "Flutter Stack",
       description:
@@ -105,8 +113,7 @@ class _SkillCardsState extends State<_SkillCards> {
       skills: ["Flutter", "Dart", "Flutter Web", "Responsive UI"],
       delay: 0,
     ),
-
-    const _SkillCard(
+    _SkillCard(
       icon: Icons.architecture,
       title: "Architecture",
       description:
@@ -116,8 +123,7 @@ class _SkillCardsState extends State<_SkillCards> {
       skills: ["BLoC", "Clean Architecture", "SOLID", "DI"],
       delay: 120,
     ),
-
-    const _SkillCard(
+    _SkillCard(
       icon: Icons.storage_rounded,
       title: "Backend & Data",
       description:
@@ -127,8 +133,7 @@ class _SkillCardsState extends State<_SkillCards> {
       skills: ["Firebase", "REST API", "Hive"],
       delay: 240,
     ),
-
-    const _SkillCard(
+    _SkillCard(
       icon: Icons.design_services_rounded,
       title: "Design & Workflow",
       description:
@@ -140,26 +145,26 @@ class _SkillCardsState extends State<_SkillCards> {
     ),
   ];
 
-  void _next() {
-    if (_currentIndex < _cards.length - 1) {
-      _currentIndex++;
-      _controller.animateToPage(
-        _currentIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutCubic,
-      );
-    }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final width = MediaQuery.of(context).size.width;
+
+    _controller = PageController(
+      viewportFraction: width < 400
+          ? 0.9
+          : width < 600
+          ? 0.85
+          : width < 900
+          ? 0.8
+          : 0.75,
+    );
   }
 
-  void _prev() {
-    if (_currentIndex > 0) {
-      _currentIndex--;
-      _controller.animateToPage(
-        _currentIndex,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutCubic,
-      );
-    }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -167,10 +172,9 @@ class _SkillCardsState extends State<_SkillCards> {
     final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 280,
+        Expanded(
+          // 🔑 FIX: PageView adapts to available height
           child: PageView.builder(
             controller: _controller,
             itemCount: _cards.length,
@@ -185,7 +189,6 @@ class _SkillCardsState extends State<_SkillCards> {
           ),
         ),
 
-        // ⬅ ➡ ARROWS (DESKTOP ONLY)
         if (!isMobile)
           Padding(
             padding: const EdgeInsets.only(top: 20),
@@ -195,13 +198,19 @@ class _SkillCardsState extends State<_SkillCards> {
                 _ArrowButton(
                   icon: Icons.arrow_back_ios_new,
                   enabled: _currentIndex > 0,
-                  onTap: _prev,
+                  onTap: () => _controller.previousPage(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOut,
+                  ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 24),
                 _ArrowButton(
                   icon: Icons.arrow_forward_ios,
                   enabled: _currentIndex < _cards.length - 1,
-                  onTap: _next,
+                  onTap: () => _controller.nextPage(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOut,
+                  ),
                 ),
               ],
             ),
@@ -210,6 +219,8 @@ class _SkillCardsState extends State<_SkillCards> {
     );
   }
 }
+
+// ================= ARROW =================
 
 class _ArrowButton extends StatelessWidget {
   final IconData icon;
@@ -226,8 +237,9 @@ class _ArrowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
+    return InkWell(
       onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(40),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(12),
@@ -252,7 +264,7 @@ class _ArrowButton extends StatelessWidget {
   }
 }
 
-// ================= SINGLE SQUARE CARD =================
+// ================= CARD =================
 
 class _SkillCard extends StatefulWidget {
   final IconData icon;
@@ -284,12 +296,10 @@ class _SkillCardState extends State<_SkillCard>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _slide = Tween<Offset>(
       begin: const Offset(0, 0.08),
@@ -310,86 +320,88 @@ class _SkillCardState extends State<_SkillCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 600;
+
+    final double cardWidth = width < 380
+        ? width * 0.85
+        : width < 600
+        ? 280
+        : width < 900
+        ? 320
+        : 360;
 
     return FadeTransition(
       opacity: _fade,
       child: SlideTransition(
         position: _slide,
-        child: Container(
-          width: 280, // 🔥 MORE SPACE
-          height: 280,
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: isDark
-                ? Colors.white.withOpacity(0.055)
-                : Colors.black.withOpacity(0.045),
-            border: Border.all(color: widget.color.withOpacity(0.35)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🔹 HEADER
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(9),
-                    decoration: BoxDecoration(
-                      color: widget.color.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(12),
+        child: Center(
+          child: Container(
+            width: cardWidth,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              color: theme.brightness == Brightness.dark
+                  ? Colors.white.withOpacity(0.06)
+                  : Colors.black.withOpacity(0.045),
+              border: Border.all(color: widget.color.withOpacity(0.35)),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 30,
+                  offset: const Offset(0, 12),
+                  color: widget.color.withOpacity(0.12),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: widget.color.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(widget.icon, size: 20, color: widget.color),
                     ),
-                    child: Icon(widget.icon, size: 20, color: widget.color),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      widget.title.toUpperCase(),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.1,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        widget.title.toUpperCase(),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    height: 1.6,
+                    color: theme.colorScheme.onSurface.withOpacity(0.75),
+                  ),
+                ),
+
+                // Chips hidden on mobile
+                if (!isMobile) ...[
+                  const SizedBox(height: 18),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: widget.skills.map((s) => SkillChip(s)).toList(),
                   ),
                 ],
-              ),
-
-              const SizedBox(height: 18),
-
-              // 📝 DESCRIPTION (CONTROLLED HEIGHT)
-              Text(
-                widget.description,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  height: 1.6,
-                  color: theme.colorScheme.onSurface.withOpacity(0.75),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // 🔹 SOFT DIVIDER (VISUAL BREATH)
-              Container(
-                height: 1,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: widget.color.withOpacity(0.35),
-                  borderRadius: BorderRadius.circular(1),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // 🏷 SKILLS (ROOMY)
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: widget.skills
-                    .map((skill) => SkillChip(skill))
-                    .toList(),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

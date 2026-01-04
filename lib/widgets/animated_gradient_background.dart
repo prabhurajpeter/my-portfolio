@@ -43,7 +43,7 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
               end: Alignment(1, 1 - (_controller.value * 2)),
               colors: [
                 scheme.surface,
-                scheme.surfaceVariant.withOpacity(0.9),
+                scheme.surfaceContainerHighest.withOpacity(0.9),
                 scheme.primary.withOpacity(0.25),
               ],
             ),

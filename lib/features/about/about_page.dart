@@ -8,14 +8,29 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 900;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: isMobile ? _mobileLayout() : _desktopLayout(),
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SafeArea(
+          // ✅ FIX 1: respect system insets
+          bottom: true,
+          child: SizedBox(
+            height: constraints.maxHeight,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20, // 🔽 reduced again
+                  ),
+                  child: isMobile ? _mobileLayout() : _desktopLayout(),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -37,7 +52,11 @@ class AboutPage extends StatelessWidget {
   Widget _mobileLayout() {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [_ThinkingStyle(), SizedBox(height: 48), _AboutNarrative()],
+      children: [
+        _ThinkingStyle(),
+        SizedBox(height: 16),
+        Expanded(child: _AboutNarrative()),
+      ],
     );
   }
 }
@@ -53,38 +72,39 @@ class _ThinkingStyle extends StatelessWidget {
     final scheme = theme.colorScheme;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionTitle("How I work"),
-        const SizedBox(height: 32),
+        const SizedBox(height: 16),
 
         _Principle(
           index: "01",
           title: "Clarity first",
           desc:
               "I start by simplifying the problem. Clear structure always leads to better code and better decisions.",
-          scheme: scheme,
           theme: theme,
+          scheme: scheme,
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 14),
 
         _Principle(
           index: "02",
           title: "Architecture matters",
           desc:
               "I design systems that scale. Clean Architecture and separation of concerns are non-negotiable.",
-          scheme: scheme,
           theme: theme,
+          scheme: scheme,
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 14),
 
         _Principle(
           index: "03",
           title: "Experience over features",
           desc:
               "I focus on how users feel when using the product — smooth flows beat complex features.",
-          scheme: scheme,
           theme: theme,
+          scheme: scheme,
         ),
       ],
     );
@@ -115,10 +135,10 @@ class _Principle extends StatelessWidget {
           index,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w800,
-            color: scheme.primary.withOpacity(0.25),
+            color: scheme.primary.withOpacity(0.22),
           ),
         ),
-        const SizedBox(width: 20),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,17 +146,17 @@ class _Principle extends StatelessWidget {
               Text(
                 title.toUpperCase(),
                 style: theme.textTheme.labelLarge?.copyWith(
-                  letterSpacing: 1.1,
+                  letterSpacing: 1.05,
                   fontWeight: FontWeight.w700,
-                  color: scheme.onBackground,
+                  color: scheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 desc,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  height: 1.6,
-                  color: scheme.onBackground.withOpacity(0.75),
+                  height: 1.45, // 🔽 critical
+                  color: scheme.onSurface.withOpacity(0.75),
                 ),
               ),
             ],
@@ -158,33 +178,41 @@ class _AboutNarrative extends StatelessWidget {
     final scheme = theme.colorScheme;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "I’m a Flutter developer who enjoys turning complex ideas "
-          "into clean, scalable, and reliable applications.\n\n"
-          "I work across mobile and web, focusing on performance, "
-          "maintainability, and thoughtful user experiences. "
-          "I enjoy working close to both design and architecture, "
-          "making sure the product feels as good as it works.\n\n"
-          "I believe strong fundamentals, consistency, and attention "
-          "to detail are what separate good apps from great ones.",
-          style: theme.textTheme.bodyLarge?.copyWith(
-            height: 1.8,
-            color: scheme.onBackground.withOpacity(0.82),
+        Flexible(
+          child: Text(
+            "I’m a Flutter developer who enjoys turning complex ideas "
+            "into clean, scalable, and reliable applications.\n\n"
+            "I work across mobile and web, focusing on performance, "
+            "maintainability, and thoughtful user experiences. "
+            "I enjoy working close to both design and architecture, "
+            "making sure the product feels as good as it works.\n\n"
+            "I believe strong fundamentals, consistency, and attention "
+            "to detail are what separate good apps from great ones.",
+            overflow: TextOverflow.ellipsis,
+            maxLines: 4,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              height: 1.55, // 🔽 precise
+              color: scheme.onSurface.withOpacity(0.82),
+            ),
           ),
         ),
 
-        const SizedBox(height: 40),
+        const SizedBox(height: 12),
 
-        Row(
-          children: const [
-            _Stat(value: "2+", label: "Years Experience"),
-            SizedBox(width: 40),
-            _Stat(value: "15+", label: "Projects Built"),
-            SizedBox(width: 40),
-            _Stat(value: "10+", label: "Clients & Teams"),
-          ],
+        Flexible(
+          // ✅ FIX 3: stats can compress
+          child: Wrap(
+            spacing: 20,
+            runSpacing: 12,
+            children: const [
+              _Stat(value: "2+", label: "Years Experience"),
+              _Stat(value: "15+", label: "Projects Built"),
+              _Stat(value: "10+", label: "Clients & Teams"),
+            ],
+          ),
         ),
       ],
     );
@@ -205,6 +233,7 @@ class _Stat extends StatelessWidget {
     final scheme = theme.colorScheme;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -214,11 +243,11 @@ class _Stat extends StatelessWidget {
             color: scheme.primary,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 2),
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: scheme.onBackground.withOpacity(0.65),
+            color: scheme.onSurface.withOpacity(0.65),
           ),
         ),
       ],

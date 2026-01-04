@@ -16,6 +16,7 @@ import 'package:protfolio/widgets/floating_circular_nav.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const PortfolioApp());
 }
 

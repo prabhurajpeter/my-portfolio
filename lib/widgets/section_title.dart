@@ -18,7 +18,7 @@ class SectionTitle extends StatelessWidget {
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
             letterSpacing: 1.4,
-            color: scheme.onBackground, // ✅ THE FIX
+            color: scheme.onSurface, // ✅ THE FIX
           ),
         ),
         const SizedBox(height: 8),
