@@ -52,8 +52,8 @@ class _AutoScrollMarqueeState extends State<AutoScrollMarquee> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            scheme.primary.withOpacity(0.9),
-            scheme.secondary.withOpacity(0.9),
+            scheme.primary.withValues(alpha: 0.9),
+            scheme.secondary.withValues(alpha: 0.9),
           ],
         ),
       ),

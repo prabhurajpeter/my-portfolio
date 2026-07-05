@@ -35,7 +35,7 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
 
     return AnimatedBuilder(
       animation: _controller,
-      builder: (_, __) {
+      builder: (_, _) {
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -43,8 +43,8 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
               end: Alignment(1, 1 - (_controller.value * 2)),
               colors: [
                 scheme.surface,
-                scheme.surfaceContainerHighest.withOpacity(0.9),
-                scheme.primary.withOpacity(0.25),
+                scheme.surfaceContainerHighest.withValues(alpha: 0.9),
+                scheme.primary.withValues(alpha: 0.25),
               ],
             ),
           ),

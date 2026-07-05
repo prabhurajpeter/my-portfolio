@@ -21,43 +21,66 @@ class FloatingCircularNav extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                  horizontal: 16,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surface.withOpacity(0.75),
+                  ).colorScheme.surface.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(40),
                   border: Border.all(
                     color: Theme.of(
                       context,
-                    ).colorScheme.outline.withOpacity(0.2),
+                    ).colorScheme.outline.withValues(alpha: 0.15),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: List.generate(_navIcons.length, (i) {
+                  children: List.generate(_navItems.length, (i) {
                     final selected = state.index == i;
+                    final item = _navItems[i];
 
-                    return GestureDetector(
-                      onTap: () => onTap(i), // ✅ ONLY CALLBACK
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 6),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: selected
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.transparent,
-                        ),
-                        child: Icon(
-                          _navIcons[i],
-                          size: 20,
-                          color: selected
-                              ? Colors.white
-                              : Theme.of(context).colorScheme.onSurface,
+                    return Tooltip(
+                      message: item.label,
+                      child: GestureDetector(
+                        onTap: () => onTap(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: selected
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.transparent,
+                            boxShadow: selected
+                                ? [
+                                    BoxShadow(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.4),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    )
+                                  ]
+                                : [],
+                          ),
+                          child: Icon(
+                            item.icon,
+                            size: 18,
+                            color: selected
+                                ? Colors.white
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     );
@@ -72,11 +95,18 @@ class FloatingCircularNav extends StatelessWidget {
   }
 }
 
-const _navIcons = [
-  Icons.home,
-  Icons.person,
-  Icons.code,
-  Icons.work,
-  Icons.school,
-  Icons.mail,
+class _NavItem {
+  final IconData icon;
+  final String label;
+  const _NavItem(this.icon, this.label);
+}
+
+const _navItems = [
+  _NavItem(Icons.home, "Home"),
+  _NavItem(Icons.person, "About Me"),
+  _NavItem(Icons.code, "Skills & Stack"),
+  _NavItem(Icons.work, "Experience"),
+  _NavItem(Icons.folder, "Featured Projects"),
+  _NavItem(Icons.school, "Education"),
+  _NavItem(Icons.mail, "Contact"),
 ];

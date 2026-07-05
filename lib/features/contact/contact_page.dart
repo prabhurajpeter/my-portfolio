@@ -1,319 +1,331 @@
 import 'package:flutter/material.dart';
-import 'package:protfolio/widgets/section_title.dart';
+import 'package:protfolio/widgets/app_selection_area.dart';
+import 'package:protfolio/widgets/gradient_button.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+// ================= SVG BRAND LOGO CONSTANTS =================
+
+const String _githubSvg = '''
+<svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+</svg>
+''';
+
+const String _linkedinSvg = '''
+<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+</svg>
+''';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
 
+  Future<void> _launchEmail() async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'prabhurajpeter@gmail.com',
+      queryParameters: {
+        'subject': 'Project Discussion / Hello from Portfolio',
+      },
+    );
+    try {
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrl(emailLaunchUri);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 850;
 
-    final isDesktop = width > 900;
-    final isMobile = width < 600;
+    return AppSelectionArea(
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Column(
+                children: [
+                  // 🚀 CTA BANNER CARD
+                  _buildCtaBanner(context, isMobile),
+                  const SizedBox(height: 56),
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 28,
-        vertical: isMobile ? 32 : 48,
+                  // 🔗 SOCIAL CONNECT ROW
+                  _buildSocialConnect(context),
+                  const SizedBox(height: 48),
+
+                  // 📄 FOOTER
+                  const Divider(height: 1),
+                  const SizedBox(height: 24),
+                  _buildFooter(context, isMobile),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionTitle("Contact"),
-          SizedBox(height: isMobile ? 24 : 40),
+    );
+  }
 
-          // 🖥️ DESKTOP → LEFT + RIGHT
-          if (isDesktop)
-            Row(
+  Widget _buildCtaBanner(BuildContext context, bool isMobile) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 24 : 48),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF1E1E2F), const Color(0xFF0F0F1A)]
+              : [const Color(0xFFF1F5F9), const Color(0xFFE2E8F0)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: isMobile
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _LeftBlock(theme)),
-                const SizedBox(width: 40),
-                _Divider(theme),
-                const SizedBox(width: 40),
-                Expanded(child: _RightBlock(theme)),
+                const Icon(
+                  Icons.near_me_rounded,
+                  size: 40,
+                  color: Colors.blueAccent,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Have a Project\nin Mind?",
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: theme.colorScheme.onSurface,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                GradientButton(
+                  onPressed: _launchEmail,
+                  height: 48,
+                  borderRadius: 12,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        "Let's Connect",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             )
-          // 📱 MOBILE → LEFT ONLY
-          else
-            _LeftBlock(theme),
-        ],
-      ),
+          : Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.near_me_rounded,
+                            size: 32,
+                            color: Colors.blueAccent,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            "LET'S WORK TOGETHER",
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              letterSpacing: 1.5,
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Have a Project in Mind?",
+                        style: theme.textTheme.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 32),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.",
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          height: 1.5,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      GradientButton(
+                        onPressed: _launchEmail,
+                        height: 48,
+                        borderRadius: 12,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              "Let's Connect",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
     );
   }
-}
 
-class _MiniGallery extends StatelessWidget {
-  const _MiniGallery();
-
-  static const images = [
-    "assets/gallery/app1.png",
-    "assets/gallery/app2.png",
-    "assets/gallery/app3.png",
-  ];
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildSocialConnect(BuildContext context) {
     final theme = Theme.of(context);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Recent work",
-          style: theme.textTheme.titleSmall?.copyWith(
+          "FIND ME ON",
+          style: theme.textTheme.labelLarge?.copyWith(
+            letterSpacing: 1.5,
             fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onSurface,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
           ),
         ),
-
-        const SizedBox(height: 12),
-
+        const SizedBox(height: 16),
         Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: images
-              .map(
-                (img) => _GalleryThumb(
-                  image: img,
-                  onTap: () => _openPreview(context, img),
-                ),
-              )
-              .toList(),
+          alignment: WrapAlignment.center,
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            _SocialIconBtn(
+              icon: _githubSvg,
+              label: "GitHub",
+              onTap: () => _launchUrl("https://github.com/prabhurajpeter"),
+            ),
+            _SocialIconBtn(
+              icon: _linkedinSvg,
+              label: "LinkedIn",
+              onTap: () => _launchUrl("https://linkedin.com/in/prabhurajpeter"),
+            ),
+            _SocialIconBtn(
+              icon: Icons.mail_outline_rounded,
+              label: "Email",
+              onTap: _launchEmail,
+            ),
+          ],
         ),
       ],
     );
   }
 
-  void _openPreview(BuildContext context, String image) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.8),
-      builder: (_) => _ImagePreview(image: image),
-    );
-  }
-}
-
-class _GalleryThumb extends StatelessWidget {
-  final String image;
-  final VoidCallback onTap;
-
-  const _GalleryThumb({required this.image, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildFooter(BuildContext context, bool isMobile) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 72,
-        height: 72,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.surfaceContainerHighest,
-          image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover),
-        ),
-      ),
-    );
-  }
-}
-
-class _ImagePreview extends StatelessWidget {
-  final String image;
-
-  const _ImagePreview({required this.image});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(24),
-      child: Stack(
+    if (isMobile) {
+      return Column(
         children: [
-          Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(image, fit: BoxFit.contain),
+          Text(
+            "PR Prabhu Raj Peter",
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
             ),
           ),
-
-          // ❌ CLOSE BUTTON
-          Positioned(
-            top: 0,
-            right: 0,
-            child: IconButton(
-              icon: const Icon(Icons.close),
-              color: theme.colorScheme.onSurface,
-              onPressed: () => Navigator.pop(context),
+          const SizedBox(height: 8),
+          Text(
+            "© 2026 Prabhu Raj Peter. All rights reserved.",
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Built with ❤️ using Flutter",
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
+      );
+    }
 
-// ================= LEFT BLOCK =================
-
-class _LeftBlock extends StatelessWidget {
-  final ThemeData theme;
-  const _LeftBlock(this.theme);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      spacing: 16,
+      runSpacing: 8,
       children: [
         Text(
-          "Let’s work together",
-          style: theme.textTheme.headlineSmall?.copyWith(
+          "PR Prabhu Raj Peter",
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w800,
-            color: theme.colorScheme.onSurface, // ✅ dark-safe
           ),
         ),
-
-        const SizedBox(height: 12),
-
         Text(
-          "I’m a Flutter Developer focused on building scalable, "
-          "clean, and high-performance mobile & web applications.",
-          style: theme.textTheme.bodyMedium?.copyWith(
-            height: 1.6,
-            color: theme.colorScheme.onSurface.withOpacity(0.75),
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        Wrap(
-          spacing: 14,
-          runSpacing: 14,
-          children: const [
-            _SocialButton(
-              label: "GitHub",
-              icon: Icons.code,
-              url: "https://github.com/yourusername",
-            ),
-            _SocialButton(
-              label: "LinkedIn",
-              icon: Icons.business_center_outlined,
-              url: "https://linkedin.com/in/yourusername",
-            ),
-            _SocialButton(
-              label: "Portfolio",
-              icon: Icons.language,
-              url: "https://yourportfolio.com",
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 32),
-
-        // 🖼️ MINI GALLERY
-        const _MiniGallery(),
-      ],
-    );
-  }
-}
-
-// ================= RIGHT BLOCK =================
-
-class _RightBlock extends StatelessWidget {
-  final ThemeData theme;
-  const _RightBlock(this.theme);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _InfoRow(
-          icon: Icons.location_on_outlined,
-          title: "Location",
-          value: "Kovilpatti, Tamil Nadu, India",
-        ),
-        const SizedBox(height: 18),
-        _InfoRow(
-          icon: Icons.work_outline,
-          title: "Role",
-          value: "Flutter Developer",
-        ),
-        const SizedBox(height: 18),
-        _InfoRow(
-          icon: Icons.email_outlined,
-          title: "Email",
-          value: "prabhurajpeter@email.com",
-          isLink: true,
-        ),
-        const SizedBox(height: 28),
-
-        Text(
-          "Available for full-time roles & freelance projects",
+          "© 2026 Prabhu Raj Peter. All rights reserved.",
           style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.primary,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
-      ],
-    );
-  }
-}
-
-// ================= INFO ROW =================
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-  final bool isLink;
-
-  const _InfoRow({
-    required this.icon,
-    required this.title,
-    required this.value,
-    this.isLink = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: theme.colorScheme.primary),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title.toUpperCase(),
-              style: theme.textTheme.labelSmall?.copyWith(
-                letterSpacing: 1,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-            const SizedBox(height: 4),
-            GestureDetector(
-              onTap: isLink
-                  ? () => launchUrl(Uri.parse("mailto:$value"))
-                  : null,
-              child: Text(
-                value,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: isLink
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface,
-                ),
-              ),
-            ),
-          ],
+        Text(
+          "Built with ❤️ using Flutter",
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
         ),
       ],
     );
@@ -322,63 +334,77 @@ class _InfoRow extends StatelessWidget {
 
 // ================= SOCIAL BUTTON =================
 
-class _SocialButton extends StatelessWidget {
+class _SocialIconBtn extends StatefulWidget {
+  final dynamic icon;
   final String label;
-  final IconData icon;
-  final String url;
+  final VoidCallback onTap;
 
-  const _SocialButton({
-    required this.label,
+  const _SocialIconBtn({
     required this.icon,
-    required this.url,
+    required this.label,
+    required this.onTap,
   });
+
+  @override
+  State<_SocialIconBtn> createState() => _SocialIconBtnState();
+}
+
+class _SocialIconBtnState extends State<_SocialIconBtn> {
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(30),
-      onTap: () => launchUrl(Uri.parse(url)),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.35),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: _hovered
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            border: Border.all(
+              color: _hovered
+                  ? theme.colorScheme.primary.withValues(alpha: 0.3)
+                  : theme.colorScheme.outline.withValues(alpha: 0.08),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              widget.icon is String
+                  ? SvgPicture.string(
+                      widget.icon as String,
+                      width: 18,
+                      height: 18,
+                      colorFilter: ColorFilter.mode(
+                        _hovered ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                        BlendMode.srcIn,
+                      ),
+                    )
+                  : Icon(
+                      widget.icon as IconData,
+                      size: 18,
+                      color: _hovered ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+              const SizedBox(width: 8),
+              Text(
+                widget.label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: _hovered ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: theme.colorScheme.primary),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
       ),
-    );
-  }
-}
-
-// ================= DIVIDER =================
-
-class _Divider extends StatelessWidget {
-  final ThemeData theme;
-  const _Divider(this.theme);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 200,
-      color: theme.colorScheme.onSurface.withOpacity(0.08),
     );
   }
 }

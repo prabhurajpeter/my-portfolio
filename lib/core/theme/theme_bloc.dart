@@ -3,9 +3,9 @@ import 'theme_event.dart';
 import 'theme_state.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
-  ThemeBloc() : super(ThemeState(isDark: false)) {
+  ThemeBloc() : super(const ThemeState(isDark: true)) {
     on<ToggleThemeEvent>((event, emit) {
-      emit(ThemeState(isDark: !state.isDark));
+      // Locked to dark mode, no action
     });
   }
 }

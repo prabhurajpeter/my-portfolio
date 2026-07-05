@@ -1,410 +1,450 @@
 import 'package:flutter/material.dart';
-import 'package:protfolio/widgets/section_title.dart';
-import 'package:protfolio/widgets/skill_chip.dart';
+import 'package:protfolio/core/navigation_notification.dart';
+import 'package:protfolio/widgets/app_selection_area.dart';
 
 class SkillsPage extends StatelessWidget {
   const SkillsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 900;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: isMobile ? _mobileLayout() : _desktopLayout(),
-        ),
-      ),
-    );
-  }
-
-  // ================= DESKTOP =================
-
-  Widget _desktopLayout() {
-    return const Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(flex: 5, child: _SkillsIntro()),
-        SizedBox(width: 64),
-        Expanded(flex: 5, child: _SkillCards()),
-      ],
-    );
-  }
-
-  // ================= MOBILE =================
-
-  Widget _mobileLayout() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SkillsIntro(),
-        SizedBox(height: 24),
-        Expanded(
-          // 🔑 FIX: cards take remaining height
-          child: _SkillCards(),
-        ),
-      ],
-    );
-  }
-}
-
-// ================= INTRO =================
-
-class _SkillsIntro extends StatelessWidget {
-  const _SkillsIntro();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min, // 🔑 IMPORTANT
-      children: [
-        const SectionTitle("Skills & Tools"),
-        const SizedBox(height: 24),
-        Text(
-          "I specialize in Flutter development with a strong focus on "
-          "clean architecture, performance, and scalable systems.\n\n"
-          "My approach blends thoughtful UI design with solid "
-          "engineering principles to build products that last.",
-          style: theme.textTheme.bodyLarge?.copyWith(
-            height: 1.7,
-            color: theme.colorScheme.onSurface.withOpacity(0.85),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Container(
-          height: 3,
-          width: 140,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ================= CARDS =================
-
-class _SkillCards extends StatefulWidget {
-  const _SkillCards();
-
-  @override
-  State<_SkillCards> createState() => _SkillCardsState();
-}
-
-class _SkillCardsState extends State<_SkillCards> {
-  late PageController _controller;
-  int _currentIndex = 0;
-
-  final _cards = const [
-    _SkillCard(
-      icon: Icons.flutter_dash,
-      title: "Flutter Stack",
-      description:
-          "Building cross-platform applications with a single codebase, "
-          "focused on performance and responsive UI.",
-      color: Color(0xFF42A5F5),
-      skills: ["Flutter", "Dart", "Flutter Web", "Responsive UI"],
-      delay: 0,
-    ),
-    _SkillCard(
-      icon: Icons.architecture,
-      title: "Architecture",
-      description:
-          "Designing scalable app structures using Clean Architecture, "
-          "BLoC pattern, and SOLID principles.",
-      color: Color(0xFF7E57C2),
-      skills: ["BLoC", "Clean Architecture", "SOLID", "DI"],
-      delay: 120,
-    ),
-    _SkillCard(
-      icon: Icons.storage_rounded,
-      title: "Backend & Data",
-      description:
-          "Handling data, APIs, and local storage with secure and "
-          "efficient data flow.",
-      color: Color(0xFF26A69A),
-      skills: ["Firebase", "REST API", "Hive"],
-      delay: 240,
-    ),
-    _SkillCard(
-      icon: Icons.design_services_rounded,
-      title: "Design & Workflow",
-      description:
-          "Collaborating with design tools and workflows to deliver "
-          "polished and user-friendly interfaces.",
-      color: Color(0xFFFF7043),
-      skills: ["Figma", "Git", "Agile", "Optimization"],
-      delay: 360,
-    ),
-  ];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
     final width = MediaQuery.of(context).size.width;
+    final isDesktop = width > 900;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    _controller = PageController(
-      viewportFraction: width < 400
-          ? 0.9
-          : width < 600
-          ? 0.85
-          : width < 900
-          ? 0.8
-          : 0.75,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 900;
-
-    return Column(
-      children: [
-        Expanded(
-          // 🔑 FIX: PageView adapts to available height
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: _cards.length,
-            onPageChanged: (i) => setState(() => _currentIndex = i),
-            itemBuilder: (_, i) {
-              return AnimatedScale(
-                duration: const Duration(milliseconds: 300),
-                scale: i == _currentIndex ? 1 : 0.92,
-                child: _cards[i],
-              );
-            },
-          ),
-        ),
-
-        if (!isMobile)
-          Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _ArrowButton(
-                  icon: Icons.arrow_back_ios_new,
-                  enabled: _currentIndex > 0,
-                  onTap: () => _controller.previousPage(
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeOut,
+    return AppSelectionArea(
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: isDesktop ? 48 : 20, vertical: 24),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF10121C) : Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.12),
+                    width: 1.2,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 24),
-                _ArrowButton(
-                  icon: Icons.arrow_forward_ios,
-                  enabled: _currentIndex < _cards.length - 1,
-                  onTap: () => _controller.nextPage(
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeOut,
-                  ),
-                ),
-              ],
+                child: isDesktop
+                    ? IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Left: Skills
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(36),
+                                child: _SkillsContent(),
+                              ),
+                            ),
+                            // Divider
+                            VerticalDivider(
+                              width: 1,
+                              color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                            ),
+                            // Right: Experience + Rocket
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(36),
+                                child: _ExperienceContent(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(28),
+                            child: _SkillsContent(),
+                          ),
+                          Divider(color: theme.colorScheme.outline.withValues(alpha: 0.1)),
+                          Padding(
+                            padding: const EdgeInsets.all(28),
+                            child: _ExperienceContent(),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
-      ],
-    );
-  }
-}
-
-// ================= ARROW =================
-
-class _ArrowButton extends StatelessWidget {
-  final IconData icon;
-  final bool enabled;
-  final VoidCallback onTap;
-
-  const _ArrowButton({
-    required this.icon,
-    required this.enabled,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(40),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: enabled
-              ? theme.colorScheme.primary.withOpacity(0.15)
-              : theme.disabledColor.withOpacity(0.1),
-          border: Border.all(
-            color: enabled
-                ? theme.colorScheme.primary.withOpacity(0.4)
-                : theme.disabledColor.withOpacity(0.2),
-          ),
-        ),
-        child: Icon(
-          icon,
-          size: 16,
-          color: enabled ? theme.colorScheme.primary : theme.disabledColor,
         ),
       ),
     );
   }
 }
 
-// ================= CARD =================
-
-class _SkillCard extends StatefulWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-  final List<String> skills;
-  final Color color;
-  final int delay;
-
-  const _SkillCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.skills,
-    required this.color,
-    required this.delay,
-  });
-
+// ===== SKILLS CONTENT =====
+class _SkillsContent extends StatelessWidget {
   @override
-  State<_SkillCard> createState() => _SkillCardState();
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final List<String> techList = [
+      'Flutter', 'Dart', 'Bloc', 'Firebase', 'UI/UX', 'Figma',
+      'Git', 'REST API', 'SQLite', 'Clean Architecture',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+          ),
+          child: Text(
+            'MY SKILLS',
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Technologies I Work With',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 24),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: techList.map((tech) => _TechChip(label: tech)).toList(),
+        ),
+      ],
+    );
+  }
 }
 
-class _SkillCardState extends State<_SkillCard>
+class _TechChip extends StatefulWidget {
+  final String label;
+  const _TechChip({required this.label});
+  @override
+  State<_TechChip> createState() => _TechChipState();
+}
+
+class _TechChipState extends State<_TechChip> {
+  bool _hovered = false;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          color: _hovered
+              ? theme.colorScheme.primary.withValues(alpha: 0.15)
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.04)
+                  : Colors.black.withValues(alpha: 0.03)),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: _hovered
+                ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                : theme.colorScheme.outline.withValues(alpha: 0.15),
+            width: 1.1,
+          ),
+        ),
+        child: Text(
+          widget.label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: _hovered
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurface.withValues(alpha: 0.85),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ===== EXPERIENCE CONTENT =====
+class _ExperienceContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'EXPERIENCE',
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: '2.8+ Years of\n',
+                          style: TextStyle(color: theme.colorScheme.onSurface),
+                        ),
+                        TextSpan(
+                          text: 'Building ',
+                          style: TextStyle(color: theme.colorScheme.primary),
+                        ),
+                        TextSpan(
+                          text: 'Solutions',
+                          style: TextStyle(color: theme.colorScheme.onSurface),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'I have worked on various projects from concept to deployment, delivering high-quality digital products.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      height: 1.55,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _MyExperienceButton(),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            const _RocketIllustration(),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ===== MY EXPERIENCE BUTTON =====
+class _MyExperienceButton extends StatefulWidget {
+  @override
+  State<_MyExperienceButton> createState() => _MyExperienceButtonState();
+}
+
+class _MyExperienceButtonState extends State<_MyExperienceButton> {
+  bool _hovered = false;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: () => ScrollToSectionNotification(5).dispatch(context),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          decoration: BoxDecoration(
+            gradient: _hovered
+                ? LinearGradient(colors: [
+                    theme.colorScheme.primary,
+                    theme.colorScheme.primary.withValues(alpha: 0.8),
+                  ])
+                : null,
+            color: _hovered ? null : theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: _hovered
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+            boxShadow: _hovered
+                ? [BoxShadow(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 12, offset: const Offset(0, 4))]
+                : [],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'My Experience',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: _hovered ? Colors.white : theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.send_rounded,
+                size: 16,
+                color: _hovered ? Colors.white : theme.colorScheme.onSurface,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ===== ROCKET ILLUSTRATION =====
+class _RocketIllustration extends StatefulWidget {
+  const _RocketIllustration();
+  @override
+  State<_RocketIllustration> createState() => _RocketIllustrationState();
+}
+
+class _RocketIllustrationState extends State<_RocketIllustration>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _fade;
-  late final Animation<Offset> _slide;
+  late final AnimationController _ctrl;
+  late final Animation<double> _bob;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 450),
+    _ctrl = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _bob = Tween<double>(begin: -10, end: 10).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
     );
-    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(_fade);
-
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.forward();
-    });
+    if (!AppSelectionArea.isTesting) _ctrl.repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final isMobile = width < 600;
 
-    final double cardWidth = width < 380
-        ? width * 0.85
-        : width < 600
-        ? 280
-        : width < 900
-        ? 320
-        : 360;
-
-    return FadeTransition(
-      opacity: _fade,
-      child: SlideTransition(
-        position: _slide,
-        child: Center(
-          child: Container(
-            width: cardWidth,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              color: theme.brightness == Brightness.dark
-                  ? Colors.white.withOpacity(0.06)
-                  : Colors.black.withOpacity(0.045),
-              border: Border.all(color: widget.color.withOpacity(0.35)),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 30,
-                  offset: const Offset(0, 12),
-                  color: widget.color.withOpacity(0.12),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: widget.color.withOpacity(0.18),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(widget.icon, size: 20, color: widget.color),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text(
-                        widget.title.toUpperCase(),
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  widget.description,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.6,
-                    color: theme.colorScheme.onSurface.withOpacity(0.75),
-                  ),
-                ),
-
-                // Chips hidden on mobile
-                if (!isMobile) ...[
-                  const SizedBox(height: 18),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: widget.skills.map((s) => SkillChip(s)).toList(),
-                  ),
-                ],
-              ],
+    return AnimatedBuilder(
+      animation: _bob,
+      builder: (_, __) => Transform.translate(
+        offset: Offset(0, _bob.value),
+        child: SizedBox(
+          width: 110,
+          child: CustomPaint(
+            size: const Size(110, 140),
+            painter: _RocketPainter(
+              primaryColor: theme.colorScheme.primary,
+              isDark: theme.brightness == Brightness.dark,
+              bobValue: _bob.value,
             ),
           ),
         ),
       ),
     );
   }
+}
+
+class _RocketPainter extends CustomPainter {
+  final Color primaryColor;
+  final bool isDark;
+  final double bobValue;
+  const _RocketPainter({required this.primaryColor, required this.isDark, required this.bobValue});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    // Glow
+    final glowPaint = Paint()
+      ..color = primaryColor.withValues(alpha: 0.25)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
+    canvas.drawCircle(Offset(cx, cy), 42, glowPaint);
+
+    // Body
+    final bodyPaint = Paint()..color = const Color(0xFFDDEAFF);
+    final bodyPath = Path()
+      ..moveTo(cx, cy - 48)
+      ..cubicTo(cx - 18, cy - 20, cx - 18, cy + 10, cx - 18, cy + 22)
+      ..lineTo(cx + 18, cy + 22)
+      ..cubicTo(cx + 18, cy + 10, cx + 18, cy - 20, cx, cy - 48);
+    canvas.drawPath(bodyPath, bodyPaint);
+
+    // Window
+    final windowPaint = Paint()..color = primaryColor.withValues(alpha: 0.85);
+    canvas.drawCircle(Offset(cx, cy - 12), 10, windowPaint);
+    final winHighlight = Paint()..color = Colors.white.withValues(alpha: 0.4);
+    canvas.drawCircle(Offset(cx - 3, cy - 15), 4, winHighlight);
+
+    // Left fin
+    final finPaint = Paint()..color = primaryColor;
+    final lFin = Path()
+      ..moveTo(cx - 18, cy + 10)
+      ..lineTo(cx - 30, cy + 28)
+      ..lineTo(cx - 18, cy + 22);
+    canvas.drawPath(lFin, finPaint);
+
+    // Right fin
+    final rFin = Path()
+      ..moveTo(cx + 18, cy + 10)
+      ..lineTo(cx + 30, cy + 28)
+      ..lineTo(cx + 18, cy + 22);
+    canvas.drawPath(rFin, finPaint);
+
+    // Flame
+    final flameFactor = (bobValue + 10) / 20;
+    final flamePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [const Color(0xFFFFA726), const Color(0xFFFF5722), Colors.transparent],
+      ).createShader(Rect.fromCenter(center: Offset(cx, cy + 38), width: 20, height: 30 + flameFactor * 10));
+    final flame = Path()
+      ..moveTo(cx - 8, cy + 22)
+      ..quadraticBezierTo(cx, cy + 48 + flameFactor * 10, cx, cy + 52 + flameFactor * 10)
+      ..quadraticBezierTo(cx, cy + 48 + flameFactor * 10, cx + 8, cy + 22);
+    canvas.drawPath(flame, flamePaint);
+
+    // Orbit ring
+    final orbitPaint = Paint()
+      ..color = primaryColor.withValues(alpha: 0.35)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy), width: 90, height: 30), orbitPaint);
+
+    // Orbit dot
+    final angle = bobValue * 0.1;
+    final dotX = cx + 45 * (angle - angle.floor()).clamp(0, 1) * 2 - 22;
+    final dotPaint = Paint()..color = primaryColor;
+    canvas.drawCircle(Offset(cx + 40, cy - 5), 4, dotPaint);
+  }
+
+  @override
+  bool shouldRepaint(_RocketPainter old) => old.bobValue != bobValue;
 }

@@ -37,9 +37,11 @@ dependencies:
   flutter_bloc: ^9.1.1
   google_fonts: ^6.3.3
   flutter_svg: ^2.2.3
-  universal_html: ^2.3.0
+  # universal_html removed - replaced with dart:html conditional imports to fix LateInitializationError
   permission_handler: ^12.0.1
   url_launcher: ^6.3.2
+  path_provider: ^2.1.1
+  # font_awesome_flutter: ^11.0.0  # removed to avoid conflicts
 
 dev_dependencies:
   flutter_test:
