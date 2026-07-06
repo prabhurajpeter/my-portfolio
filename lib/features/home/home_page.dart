@@ -6,34 +6,15 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:protfolio/core/navigation_notification.dart';
 import 'package:protfolio/widgets/app_selection_area.dart';
 import 'package:protfolio/widgets/gradient_button.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:protfolio/util/web_download_stub.dart' if (dart.library.html) 'package:protfolio/util/web_download_web.dart'; // conditional import for download helper
 import 'package:url_launcher/url_launcher.dart';
 
-// ================= SVG BRAND LOGO CONSTANTS =================
-
-const String _githubSvg = '''
-<svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-</svg>
-''';
-
-const String _linkedinSvg = '''
-<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-</svg>
-''';
-
-const String _instagramSvg = '''
-<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051c-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4.162 4.162 0 110-8.324A4.162 4.162 0 0112 16zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-</svg>
-''';
+// Brand logos are now moved to lib/util/brand_icons.dart
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -97,17 +78,20 @@ class _HomePageState extends State<HomePage>
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 64,
-                      ),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 1200),
-                          child: isMobile
-                              ? _mobileLayout(context)
-                              : _desktopLayout(context),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: isMobile ? 500 : 700),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 64,
+                        ),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1200),
+                            child: isMobile
+                                ? _mobileLayout(context)
+                                : _desktopLayout(context),
+                          ),
                         ),
                       ),
                     ),
@@ -138,7 +122,11 @@ class _HomePageState extends State<HomePage>
           flex: 6,
           child: _leftContent(context),
         ),
-        const Spacer(flex: 4),
+        const Spacer(flex: 1),
+        Expanded(
+          flex: 5,
+          child: _rightContent(context),
+        ),
       ],
     );
   }
@@ -149,12 +137,38 @@ class _HomePageState extends State<HomePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        _rightContent(context, isMobile: true),
+        const SizedBox(height: 48),
         _leftContent(context, center: true),
       ],
     );
   }
 
-  // ================= LEFT CONTENT =================
+  // ================= RIGHT CONTENT =================
+
+  Widget _rightContent(BuildContext context, {bool isMobile = false}) {
+    // The image is now handled by the AnimatedGradientBackground's Stack.
+    // We wrap this Stack in a SizedBox to provide bounded constraints for the layout.
+    return SizedBox(
+      height: isMobile ? 100 : 500,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          if (!isMobile)
+            Positioned(
+              top: 60,
+              right: 20,
+              child: _FloatingWidget(
+                child: _CodeSnippetCard(),
+              ),
+            ),
+          // Add a dummy container as a non-positioned child if needed to ensure the stack has a base size,
+          // though SizedBox handles it here.
+          const SizedBox.expand(),
+        ],
+      ),
+    );
+  }
 
   Widget _leftContent(BuildContext context, {bool center = false}) {
     final theme = Theme.of(context);
@@ -178,7 +192,7 @@ class _HomePageState extends State<HomePage>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("👋", style: TextStyle(fontSize: 14)),
+              const Text("\u{1F44B}", style: TextStyle(fontSize: 14)),
               const SizedBox(width: 8),
               Text(
                 "Hi, I'm",
@@ -288,43 +302,45 @@ class _HomePageState extends State<HomePage>
         const SizedBox(height: 48),
 
         // Social handles "Find me on"
-        Wrap(
-          alignment: center ? WrapAlignment.center : WrapAlignment.start,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 12,
-          runSpacing: 12,
+        Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               "Find me on",
               style: theme.textTheme.labelMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
               ),
             ),
+            const SizedBox(width: 16),
             _GlowSocialButton(
-              icon: _githubSvg,
+              icon: 'assets/icons/github.svg',
               color: Colors.white,
               tooltip: "GitHub",
               onTap: () {
                 launchUrl(Uri.parse("https://github.com/prabhurajpeter"));
               },
             ),
+            const SizedBox(width: 10),
             _GlowSocialButton(
-              icon: _linkedinSvg,
+              icon: 'assets/icons/linkedin.svg',
               color: const Color(0xFF0A66C2),
               tooltip: "LinkedIn",
               onTap: () {
-                launchUrl(Uri.parse("https://linkedin.com/in/prabhurajpeter"));
+                launchUrl(Uri.parse("https://www.linkedin.com/in/prabhurajpeter/"));
               },
             ),
+            const SizedBox(width: 10),
             _GlowSocialButton(
-              icon: _instagramSvg,
+              icon: 'assets/icons/instagram.svg',
               color: const Color(0xFFE1306C),
               tooltip: "Instagram",
               onTap: () {
-                launchUrl(Uri.parse("https://instagram.com/prabhurajpeter"));
+                launchUrl(Uri.parse("https://www.instagram.com/_peter026_/"));
               },
             ),
+            const SizedBox(width: 10),
             _GlowSocialButton(
               icon: Icons.mail_outline_rounded,
               color: theme.colorScheme.primary,
@@ -399,38 +415,32 @@ class _GlowSocialButtonState extends State<_GlowSocialButton> {
             curve: Curves.easeOut,
             transform: Matrix4.translationValues(0.0, _hovered ? -4.0 : 0.0, 0.0),
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
+            decoration:BoxDecoration(
               shape: BoxShape.circle,
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              color: _hovered
+                  ? widget.color.withValues(alpha: 0.1)
+                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               border: Border.all(
                 color: _hovered
-                    ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                    : theme.colorScheme.outline.withValues(alpha: 0.1),
+                    ? widget.color.withValues(alpha: 0.5)
+                    : theme.colorScheme.outline.withValues(alpha: 0.2),
+                width: 1,
               ),
-              boxShadow: _hovered
-                  ? [
-                      BoxShadow(
-                        color: widget.color.withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : [],
             ),
             child: widget.icon is String
-                ? SvgPicture.string(
+                ? SvgPicture.asset(
                     widget.icon as String,
-                    width: 20,
-                    height: 20,
+                    width: 16,
+                    height: 16,
                     colorFilter: ColorFilter.mode(
-                      _hovered ? widget.color : theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                      _hovered ? widget.color : theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       BlendMode.srcIn,
                     ),
                   )
                 : Icon(
                     widget.icon as IconData,
-                    color: _hovered ? widget.color : theme.colorScheme.onSurface.withValues(alpha: 0.75),
-                    size: 20,
+                    color: _hovered ? widget.color : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 16,
                   ),
           ),
         ),
@@ -459,13 +469,13 @@ class _SeamlessMarqueeState extends State<_SeamlessMarquee> {
     if (AppSelectionArea.isTesting) return;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_controller.hasClients) {
+      if (_controller.hasClients && _controller.position.maxScrollExtent > 0) {
         _controller.jumpTo(_controller.position.maxScrollExtent / 3);
       }
     });
 
     _timer = Timer.periodic(const Duration(milliseconds: 18), (_) {
-      if (!_controller.hasClients) return;
+      if (!_controller.hasClients || _controller.position.maxScrollExtent <= 0) return;
       _controller.jumpTo(_controller.offset + 1);
       if (_controller.offset >= _controller.position.maxScrollExtent * 2 / 3) {
         _controller.jumpTo(_controller.position.maxScrollExtent / 3);
@@ -501,9 +511,12 @@ class _SeamlessMarqueeState extends State<_SeamlessMarquee> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(text.toUpperCase(), style: style),
               ),
-              const Text(
-                "✦",
-                style: TextStyle(fontSize: 10, color: Colors.black54),
+              Text(
+                "\u{2726}",
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.6),
+                ),
               ),
             ],
           );
@@ -511,6 +524,56 @@ class _SeamlessMarqueeState extends State<_SeamlessMarquee> {
       ),
     );
   }
+}
+
+class _CodeSnippetCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10121A).withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _dot(Colors.red),
+              const SizedBox(width: 4),
+              _dot(Colors.amber),
+              const SizedBox(width: 4),
+              _dot(Colors.green),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _codeLine("import 'package:flutter/material.dart';", Colors.purpleAccent),
+          _codeLine("class Portfolio extends StatelessWidget {", Colors.blueAccent),
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: _codeLine("Widget build(BuildContext context) {", Colors.blueAccent),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 24),
+            child: _codeLine("return Text('Hello World');", Colors.orangeAccent),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dot(Color c) => Container(width: 6, height: 6, decoration: BoxDecoration(shape: BoxShape.circle, color: c));
+  Widget _codeLine(String text, Color color) => Text(text, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: color.withValues(alpha: 0.8)));
 }
 
 // ================= GRADIENT BACKGROUND =================
@@ -543,7 +606,7 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
   }
 
   void _tick() {
-    // 🧈 Smooth interpolation (LERP)
+    // 🎈 Smooth interpolation (LERP)
     _current = Offset(
       _current.dx + (_target.dx - _current.dx) * 0.08,
       _current.dy + (_target.dy - _current.dy) * 0.08,
@@ -572,33 +635,45 @@ class _AnimatedGradientBackgroundState extends State<AnimatedGradientBackground>
       },
       child: Stack(
         children: [
-          // 🎨 Background Image spanning the full width of the screen background
+          // 🎨 Background
           Positioned.fill(
-            child: AppSelectionArea.isTesting
-                ? Container(color: const Color(0xFF06070B))
-                : Image.asset(
-                    "assets/peter.png",
-                    fit: BoxFit.cover,
-                    alignment: Alignment.centerRight,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(color: const Color(0xFF06070B)),
-                  ),
+            child: Container(color: const Color(0xFF06070B)),
           ),
 
-          // 🌫️ Linear gradient to soften the image on the left for text contrast
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF06070B).withValues(alpha: 0.9),
-                    const Color(0xFF06070B).withValues(alpha: 0.5),
-                    const Color(0xFF06070B).withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
+          // 👤 Person Image as Background (Aligned Right)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            top: 0,
+            child: Opacity(
+              opacity: 0.8,
+              child: Image.asset(
+                "assets/peter.png",
+                fit: BoxFit.contain,
+                alignment: Alignment.bottomRight,
+                errorBuilder: (context, error, stackTrace) => const SizedBox(),
               ),
+            ),
+          ),
+
+          // 🌫️ Soft glow following cursor
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (_, _) {
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: FractionalOffset(_current.dx, _current.dy),
+                      radius: 0.8,
+                      colors: [
+                        theme.colorScheme.primary.withValues(alpha: 0.08),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 

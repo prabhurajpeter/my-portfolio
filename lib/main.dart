@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart'; 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:protfolio/core/theme/theme_bloc.dart';
 import 'package:protfolio/core/theme/theme_event.dart';
 import 'package:protfolio/core/theme/theme_state.dart';
@@ -42,7 +42,7 @@ class PortfolioApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               textTheme: GoogleFonts.spaceGroteskTextTheme(),
-              colorSchemeSeed: const Color(0xFF6366F1), // Modern Indigo
+              colorSchemeSeed: const Color(0xFF7C3AED), // Stylish Purple
             ),
             darkTheme: ThemeData(
               useMaterial3: true,
@@ -50,7 +50,7 @@ class PortfolioApp extends StatelessWidget {
               brightness: Brightness.dark,
               scaffoldBackgroundColor: const Color(0xFF06070B),
               colorScheme: const ColorScheme.dark(
-                primary: Color(0xFF6366F1),
+                primary: Color(0xFF7C3AED),
                 surface: Color(0xFF06070B),
                 surfaceContainer: Color(0xFF10121A),
                 surfaceContainerHighest: Color(0xFF161822),
@@ -74,10 +74,18 @@ class MainScaffold extends StatefulWidget {
 
 class _MainScaffoldState extends State<MainScaffold> {
   late final ScrollController _scrollController;
-  final List<GlobalKey> _sectionKeys = List.generate(7, (_) => GlobalKey());
+  final List<GlobalKey> _sectionKeys = List.generate(8, (_) => GlobalKey());
 
-  final List<int> _navIndices = [0, 1, 4, 3, 5, 6];
-  final List<String> _navLabels = ["Home", "About", "Skills", "Projects", "Experience", "Contact"];
+  final List<int> _navIndices = [0, 1, 4, 3, 5, 6, 7];
+  final List<String> _navLabels = [
+    "Home",
+    "About",
+    "Skills",
+    "Projects",
+    "Experience",
+    "Education",
+    "Contact",
+  ];
 
   @override
   void initState() {
@@ -130,7 +138,11 @@ class _MainScaffoldState extends State<MainScaffold> {
     context.read<NavigationBloc>().add(ScrollToSection(index));
   }
 
-  Widget _buildHeaderNavBar(BuildContext context, int activeIndex, bool isDark) {
+  Widget _buildHeaderNavBar(
+    BuildContext context,
+    int activeIndex,
+    bool isDark,
+  ) {
     final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width;
     final isDesktop = width > 900;
@@ -167,24 +179,28 @@ class _MainScaffoldState extends State<MainScaffold> {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              Text(
-                "Prabhu Raj Peter",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.onSurface,
+              if (width > 480) ...[
+                const SizedBox(width: 10),
+                Text(
+                  "Prabhu Raj Peter",
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
-          
+
           // Center: Navigation Links (Desktop only)
           if (isDesktop)
             Row(
               children: List.generate(_navLabels.length, (i) {
                 final targetIndex = _navIndices[i];
-                final selected = activeIndex == targetIndex || 
-                    (targetIndex == 5 && activeIndex == 5); // Experience or Education
+                final selected =
+                    activeIndex == targetIndex ||
+                    (targetIndex == 5 &&
+                        activeIndex == 5); // Experience or Education
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: GestureDetector(
@@ -195,10 +211,14 @@ class _MainScaffoldState extends State<MainScaffold> {
                         Text(
                           _navLabels[i],
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                            fontWeight: selected
+                                ? FontWeight.bold
+                                : FontWeight.w500,
                             color: selected
                                 ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                : theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.7,
+                                  ),
                           ),
                         ),
                         if (selected) ...[
@@ -223,7 +243,8 @@ class _MainScaffoldState extends State<MainScaffold> {
           Row(
             children: [
               GradientButton(
-                onPressed: () => _onNavTap(6), // Scrolls to Contact Page (index 6)
+                onPressed: () =>
+                    _onNavTap(6), // Scrolls to Contact Page (index 6)
                 height: 40,
                 borderRadius: 20,
                 child: Row(
@@ -265,8 +286,12 @@ class _MainScaffoldState extends State<MainScaffold> {
                 body: Column(
                   children: [
                     // Top Navbar
-                    _buildHeaderNavBar(context, navState.index, themeState.isDark),
-                    
+                    _buildHeaderNavBar(
+                      context,
+                      navState.index,
+                      themeState.isDark,
+                    ),
+
                     // Main scrollable content
                     Expanded(
                       child: Stack(
@@ -281,13 +306,15 @@ class _MainScaffoldState extends State<MainScaffold> {
                                 ProjectsPage(key: _sectionKeys[3]),
                                 SkillsPage(key: _sectionKeys[4]),
                                 ExperiencePage(key: _sectionKeys[5]),
-                                EducationPage(),
-                                ContactPage(key: _sectionKeys[6]),
-                                const SizedBox(height: 80), // bottom space for footer
+                                EducationPage(key: _sectionKeys[6]),
+                                ContactPage(key: _sectionKeys[7]),
+                                const SizedBox(
+                                  height: 80,
+                                ), // bottom space for footer
                               ],
                             ),
                           ),
-  
+
                           // Floating Circular Navigation Overlay
                           Positioned(
                             left: 0,
@@ -295,7 +322,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                             bottom: 24,
                             child: FloatingCircularNav(
                               onTap: (index) {
-                                _onNavTap(index);
+                                _onNavTap(_navIndices[index]);
                               },
                             ),
                           ),
@@ -336,4 +363,3 @@ class ThemeToggleSwitch extends StatelessWidget {
     );
   }
 }
-

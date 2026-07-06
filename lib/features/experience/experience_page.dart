@@ -63,148 +63,184 @@ class _TimelineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isCompact = screenWidth < 600;
 
-    return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── TIMELINE INDICATOR ──
-          SizedBox(
-            width: 32,
-            child: Column(
-              children: [
-                // Top connector
-                if (!isFirst)
-                  Container(width: 2, height: 16,
-                      color: theme.colorScheme.primary.withValues(alpha: 0.25)),
-                // Dot
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: experience.isCurrent
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.primary.withValues(alpha: 0.65),
-                    boxShadow: experience.isCurrent
-                        ? [
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.45),
-                              blurRadius: 10,
-                              spreadRadius: 1.5,
-                            )
-                          ]
-                        : [],
-                  ),
+    return Stack(
+      children: [
+        // ── TIMELINE INDICATOR ──
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 32,
+          child: Column(
+            children: [
+              // Top connector / spacer
+              Container(
+                width: 2,
+                height: 28,
+                color: isFirst
+                    ? Colors.transparent
+                    : theme.colorScheme.primary.withValues(alpha: 0.25),
+              ),
+              // Dot
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: experience.isCurrent
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.primary.withValues(alpha: 0.65),
+                  boxShadow: experience.isCurrent
+                      ? [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.45),
+                            blurRadius: 10,
+                            spreadRadius: 1.5,
+                          )
+                        ]
+                      : [],
                 ),
-                // Bottom connector
-                if (!isLast)
-                  Container(
-                    width: 2,
-                    height: 40,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                  ),
-              ],
-            ),
+              ),
+              // Bottom connector
+              Expanded(
+                child: Container(
+                  width: 2,
+                  color: isLast
+                      ? Colors.transparent
+                      : theme.colorScheme.primary.withValues(alpha: 0.25),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          // ── GLASS CARD CONTENT ──
-          Expanded(
+        ),
+        // ── GLASS CARD CONTENT ──
+        Padding(
+          padding: const EdgeInsets.only(left: 44, bottom: 24),
+          child: _HoverCard(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: _HoverCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  experience.role,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  experience.company,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            experience.period,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: experience.isCurrent
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                            ),
-                          ),
-                        ],
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (isCompact) ...[
+                    Text(
+                      experience.role,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        experience.location,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.55),
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      experience.company,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(height: 14),
-                      ...experience.highlights.map(
-                        (highlight) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Row(
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      experience.period,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: experience.isCurrent
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ] else ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6, right: 8),
-                                child: Container(
-                                  width: 5,
-                                  height: 5,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: theme.colorScheme.primary
-                                        .withValues(alpha: 0.75),
-                                  ),
+                              Text(
+                                experience.role,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onSurface,
                                 ),
                               ),
-                              Expanded(
-                                child: Text(
-                                  highlight,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    height: 1.45,
-                                    color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.85),
-                                  ),
+                              const SizedBox(height: 4),
+                              Text(
+                                experience.company,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Text(
+                          experience.period,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: experience.isCurrent
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 6),
+                  Text(
+                    experience.location,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface
+                          .withValues(alpha: 0.55),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 14),
+                  ...experience.highlights.map(
+                    (highlight) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6, right: 8),
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: theme.colorScheme.primary
+                                    .withValues(alpha: 0.75),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              highlight,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                height: 1.45,
+                                color: theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.85),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
+      ],
     );
   }
 }

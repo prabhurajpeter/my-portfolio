@@ -24,23 +24,23 @@ class NavigationView extends StatelessWidget {
                       context.read<NavigationBloc>().add(ScrollToSection(i)),
                   items: const [
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
+                      icon: Icon(Icons.home_rounded),
                       label: "Home",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.person),
+                      icon: Icon(Icons.person_outline_rounded),
                       label: "About",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.code),
+                      icon: Icon(Icons.code_rounded),
                       label: "Skills",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.work),
+                      icon: Icon(Icons.folder_rounded),
                       label: "Projects",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.mail),
+                      icon: Icon(Icons.mail_outline_rounded),
                       label: "Contact",
                     ),
                   ],

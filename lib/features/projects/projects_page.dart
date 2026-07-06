@@ -1,6 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:protfolio/widgets/app_selection_area.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProjectsPage extends StatelessWidget {
   const ProjectsPage({super.key});
@@ -93,43 +92,47 @@ class ProjectsPage extends StatelessWidget {
                   const SizedBox(height: 36),
                   // Project Cards
                   if (isDesktop)
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Column(
                       children: [
-                        Expanded(child: _FeaturedProjectCard(project: _featuredProjects[0])),
-                        const SizedBox(width: 24),
-                        Expanded(child: _FeaturedProjectCard(project: _featuredProjects[1])),
-                        const SizedBox(width: 24),
-                        Expanded(child: _FeaturedProjectCard(project: _featuredProjects[2])),
+                        for (int i = 0; i < _featuredProjects.length; i += 3) ...[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _FeaturedProjectCard(project: _featuredProjects[i])),
+                              const SizedBox(width: 24),
+                              if (i + 1 < _featuredProjects.length) ...[
+                                Expanded(child: _FeaturedProjectCard(project: _featuredProjects[i + 1])),
+                                const SizedBox(width: 24),
+                              ] else ...[
+                                const Expanded(child: SizedBox()),
+                                const SizedBox(width: 24),
+                              ],
+                              if (i + 2 < _featuredProjects.length)
+                                Expanded(child: _FeaturedProjectCard(project: _featuredProjects[i + 2]))
+                              else
+                                const Expanded(child: SizedBox()),
+                            ],
+                          ),
+                          if (i + 3 < _featuredProjects.length)
+                            const SizedBox(height: 24),
+                        ],
                       ],
                     )
                   else if (isTablet)
-                    Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _FeaturedProjectCard(project: _featuredProjects[0])),
-                            const SizedBox(width: 20),
-                            Expanded(child: _FeaturedProjectCard(project: _featuredProjects[1])),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: width * 0.5,
-                          child: _FeaturedProjectCard(project: _featuredProjects[2]),
-                        ),
-                      ],
+                    Wrap(
+                      spacing: 20,
+                      runSpacing: 24,
+                      children: _featuredProjects.map((p) => SizedBox(
+                        width: (width - 60) / 2,
+                        child: _FeaturedProjectCard(project: p),
+                      )).toList(),
                     )
                   else
                     Column(
-                      children: [
-                        _FeaturedProjectCard(project: _featuredProjects[0]),
-                        const SizedBox(height: 24),
-                        _FeaturedProjectCard(project: _featuredProjects[1]),
-                        const SizedBox(height: 24),
-                        _FeaturedProjectCard(project: _featuredProjects[2]),
-                      ],
+                      children: _featuredProjects.map((p) => Padding(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        child: _FeaturedProjectCard(project: p),
+                      )).toList(),
                     ),
                 ],
               ),
@@ -141,101 +144,271 @@ class ProjectsPage extends StatelessWidget {
   }
 
   void _showAllProjectsDialog(BuildContext context) {
-    showModalBottomSheet(
+    showGeneralDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
+      barrierDismissible: true,
+      barrierLabel: 'Close Catalog',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 350),
+      pageBuilder: (context, animation, secondaryAnimation) {
         final theme = Theme.of(context);
         final isDark = theme.brightness == Brightness.dark;
-        return DraggableScrollableSheet(
-          initialChildSize: 0.75,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          builder: (_, controller) {
-            return Container(
+        final width = MediaQuery.of(context).size.width;
+        final isMobile = width < 600;
+
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: width * (isMobile ? 0.88 : 0.45),
+              constraints: const BoxConstraints(
+                maxWidth: 480,
+                minWidth: 320,
+              ),
+              height: double.infinity,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF161B22) : Colors.white,
+                color: isDark ? const Color(0xFF11141A) : Colors.white,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
+                  bottomLeft: Radius.circular(24),
                 ),
-                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, -4))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(-4, 0),
+                  ),
+                ],
+                border: Border(
+                  left: BorderSide(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.12),
+                    width: 1.5,
+                  ),
+                ),
               ),
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 48, height: 5,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text("All Project Catalog",
-                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 6),
-                  Text(
-                    "Enterprise applications and systems from my resume experience.",
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: ListView.separated(
-                      controller: controller,
-                      itemCount: _allProjects.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final item = _allProjects[index];
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
-                            border: Border.all(
-                              color: theme.colorScheme.outline.withValues(alpha: 0.08), width: 1),
-                          ),
-                          child: Column(
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(item.title,
-                                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                              const SizedBox(height: 6),
-                              Text(item.description,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7), height: 1.4)),
-                              const SizedBox(height: 12),
-                              Wrap(
-                                spacing: 8, runSpacing: 8,
-                                children: item.tech.map((t) => Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(t,
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: theme.colorScheme.primary, fontWeight: FontWeight.w600)),
-                                )).toList(),
+                              Text(
+                                "All Projects",
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "My complete project catalog",
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                ),
                               ),
                             ],
                           ),
-                        );
-                      },
-                    ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // Projects List
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            _buildSectionHeader(theme, "FEATURED PROJECTS"),
+                            const SizedBox(height: 12),
+                            ..._allProjects
+                                .where((p) => p.isFeatured)
+                                .map((p) => _ProjectExpansionTile(project: p)),
+                            const SizedBox(height: 24),
+                            _buildSectionHeader(theme, "ADDITIONAL PROJECTS"),
+                            const SizedBox(height: 12),
+                            ..._allProjects
+                                .where((p) => !p.isFeatured)
+                                .map((p) => _ProjectExpansionTile(project: p)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            );
-          },
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1.0, 0.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutQuint,
+          )),
+          child: child,
         );
       },
     );
+  }
+
+  Widget _buildSectionHeader(ThemeData theme, String title) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Divider(
+            color: theme.colorScheme.primary.withValues(alpha: 0.2),
+            thickness: 1,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ===== PROJECT EXPANSION TILE =====
+class _ProjectExpansionTile extends StatefulWidget {
+  final _CatalogProject project;
+  const _ProjectExpansionTile({required this.project});
+
+  @override
+  State<_ProjectExpansionTile> createState() => _ProjectExpansionTileState();
+}
+
+class _ProjectExpansionTileState extends State<_ProjectExpansionTile> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: _isExpanded
+            ? theme.colorScheme.primary.withValues(alpha: 0.04)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: _isExpanded
+                ? theme.colorScheme.primary.withValues(alpha: 0.3)
+                : theme.colorScheme.outline.withValues(alpha: 0.08),
+            width: 1,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Theme(
+          data: theme.copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+          title: Text(
+            widget.project.title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: _isExpanded ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+            ),
+          ),
+          trailing: AnimatedRotation(
+            turns: _isExpanded ? 0.5 : 0,
+            duration: const Duration(milliseconds: 200),
+            child: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: _isExpanded ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+          onExpansionChanged: (expanded) {
+            setState(() {
+              _isExpanded = expanded;
+            });
+          },
+          childrenPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          expandedAlignment: Alignment.topLeft,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Divider(height: 16, thickness: 0.8),
+                const SizedBox(height: 4),
+                // Detailed points
+                ...widget.project.details.map((detail) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5.0, right: 8.0),
+                        child: Container(
+                          width: 5,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.8),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          detail,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+                const SizedBox(height: 12),
+                // Tech chips
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: widget.project.tech.map((t) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                      ),
+                    ),
+                    child: Text(
+                      t,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )).toList(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
   }
 }
 
@@ -494,64 +667,159 @@ class _FeaturedProject {
 }
 
 class _CatalogProject {
-  final String title, description;
+  final String title;
+  final List<String> details;
   final List<String> tech;
-  const _CatalogProject({required this.title, required this.description, required this.tech});
+  final bool isFeatured;
+  const _CatalogProject({
+    required this.title,
+    required this.details,
+    required this.tech,
+    this.isFeatured = false,
+  });
 }
 
 const _featuredProjects = [
   _FeaturedProject(
-    title: 'Roami',
-    description: 'A social travel app to connect travelers and explore together.',
-    gradientColors: [Color(0xFF7B2FBE), Color(0xFF4A0080)],
-    appIcon: Icons.travel_explore_rounded,
-    tech: ['Flutter', 'Firebase', 'Maps'],
+    title: 'Native Android & iOS to Flutter Migration',
+    description: 'Successfully migrated legacy native applications to Flutter for B2B and B2C users while preserving session authentication.',
+    gradientColors: [Color(0xFF00B4AB), Color(0xFF007A74)],
+    appIcon: Icons.swap_calls_rounded,
+    tech: ['Flutter', 'Migration', 'iOS/Android'],
   ),
   _FeaturedProject(
-    title: 'Happiwrap',
-    description: 'E-commerce app for gifting platform with beautiful UI.',
-    gradientColors: [Color(0xFF2D8B5E), Color(0xFF0F5C3A)],
-    appIcon: Icons.card_giftcard_rounded,
-    tech: ['Flutter', 'Dio', 'API'],
+    title: 'Shopmate Grocery Application',
+    description: 'Developed an e-commerce mobile application with Razorpay payment integration, cart, and secure checkouts.',
+    gradientColors: [Color(0xFFFF9A8B), Color(0xFFFF6A88)],
+    appIcon: Icons.shopping_cart_rounded,
+    tech: ['Flutter', 'Razorpay', 'Firebase'],
   ),
   _FeaturedProject(
-    title: 'LAX Cinemas',
-    description: 'Movie ticket booking app with seat selection and offers.',
-    gradientColors: [Color(0xFF6B22B5), Color(0xFF2D0A6B)],
-    appIcon: Icons.local_movies_rounded,
-    tech: ['Flutter', 'Bloc', 'Payment'],
+    title: 'Production ERP Monitoring Application',
+    description: 'Built a production monitoring solution with scan-to-move functionality and real-time tracking.',
+    gradientColors: [Color(0xFF434343), Color(0xFF000000)],
+    appIcon: Icons.analytics_rounded,
+    tech: ['Flutter Web', 'Barcode', 'Audit'],
+  ),
+  _FeaturedProject(
+    title: 'Quality Control Tablet Application',
+    description: 'Developed inspection and rejection tracking systems for manufacturing environments with digital audits.',
+    gradientColors: [Color(0xFF4F46E5), Color(0xFF312E81)],
+    appIcon: Icons.tablet_mac_rounded,
+    tech: ['Flutter', 'Tablet UI', 'SQLite'],
+  ),
+  _FeaturedProject(
+    title: 'Hospital Management System',
+    description: 'Developed mobile and web solutions for hospital administration, scheduling, patient records, and billing.',
+    gradientColors: [Color(0xFF0EA5E9), Color(0xFF0369A1)],
+    appIcon: Icons.local_hospital_rounded,
+    tech: ['Flutter Web', 'Billing', 'Auth'],
   ),
 ];
 
 const _allProjects = [
+  // FEATURED PROJECTS
   _CatalogProject(
     title: 'Native Android & iOS to Flutter Migration',
-    description: 'Successfully migrated legacy native B2B/B2C apps into a single Flutter code framework.',
+    isFeatured: true,
+    details: [
+      'Migrated existing native applications to Flutter for B2B and B2C users.',
+      'Preserved user sessions and authentication during application upgrades.',
+      'Delivered a seamless transition without affecting existing customers.',
+    ],
     tech: ['Flutter', 'iOS & Android', 'Migration', 'Auth Preservation'],
   ),
   _CatalogProject(
     title: 'Shopmate Grocery Application',
-    description: 'A full-scale grocery store shopping app with payment flow integration and cart actions.',
+    isFeatured: true,
+    details: [
+      'Developed an e-commerce mobile application with Razorpay payment integration.',
+      'Implemented cart management, search functionality, and secure checkout experiences.',
+    ],
     tech: ['Flutter', 'Razorpay', 'Firebase', 'Cart Flow'],
   ),
   _CatalogProject(
     title: 'Production ERP Monitoring Application',
-    description: 'Enterprise ERP log utility with barcode scanning and manufacturing line audits.',
-    tech: ['Flutter Web', 'Scan-to-Move', 'Traceability'],
+    isFeatured: true,
+    details: [
+      'Built a production monitoring solution with scan-to-move functionality.',
+      'Improved operational traceability through digital workflows and real-time tracking.',
+    ],
+    tech: ['Flutter Web', 'Scan-to-Move', 'Traceability', 'ERP'],
   ),
   _CatalogProject(
     title: 'Quality Control Tablet Application',
-    description: 'Industrial tablet inspections utility logging audits and product rejection reasons.',
+    isFeatured: true,
+    details: [
+      'Developed inspection and rejection tracking systems for manufacturing environments.',
+      'Enabled digital quality audits and corrective action workflows.',
+      'Reduced manual errors through structured inspection processes.',
+    ],
     tech: ['Flutter', 'Tablet UI', 'Offline Cache', 'SQLite'],
   ),
   _CatalogProject(
     title: 'Hospital Management System',
-    description: 'Clinic administrative system scheduling doctor sessions and handling checkout billing.',
+    isFeatured: true,
+    details: [
+      'Developed mobile and web solutions for hospital administration.',
+      'Implemented appointment scheduling, patient records, billing, and secure authentication.',
+    ],
     tech: ['Flutter Web', 'Appointments', 'Billing', 'Auth'],
+  ),
+
+  // ADDITIONAL PROJECTS
+  _CatalogProject(
+    title: 'Tripsheet Management Application',
+    isFeatured: false,
+    details: [
+      'Developed an application to track and manage trips, route entries, and vehicle logs.',
+      'Provided digital trip sheet submission, distance tracking, and driver log sheets.',
+    ],
+    tech: ['Flutter', 'Geolocation', 'Offline Sync'],
+  ),
+  _CatalogProject(
+    title: 'Construction Management Entry Application',
+    isFeatured: false,
+    details: [
+      'Built a data entry platform for recording daily site logs, material consumption, and workforce attendance.',
+      'Enabled quick field reports and image attachments for proof of work.',
+    ],
+    tech: ['Flutter', 'Local DB', 'File Handling'],
+  ),
+  _CatalogProject(
+    title: 'Task Management Platform',
+    isFeatured: false,
+    details: [
+      'Designed and implemented a collaborative task board for teams with real-time status updates.',
+      'Integrated push notifications and deadline reminders.',
+    ],
+    tech: ['Flutter', 'Realtime DB', 'Push Notifications'],
+  ),
+  _CatalogProject(
+    title: 'Employee Management Application',
+    isFeatured: false,
+    details: [
+      'Developed a system for profile management, check-in/check-out logs, and leave requests.',
+      'Automated HR check-ins and performance history tracking.',
+    ],
+    tech: ['Flutter', 'REST API', 'Shared Preferences'],
+  ),
+  _CatalogProject(
+    title: 'Staff Management Application (Educational Industry)',
+    isFeatured: false,
+    details: [
+      'Built a comprehensive solution for managing teachers\' schedules, attendance, classes, and lesson plans.',
+      'Integrated parent-teacher updates and student attendance tracking.',
+    ],
+    tech: ['Flutter', 'Firebase', 'Role-based Auth'],
   ),
   _CatalogProject(
     title: 'Billing Application for Local Retail Stores',
-    description: 'Offline billing desktop app with digital invoice creation and financial report exports.',
-    tech: ['Flutter', 'Hive', 'Offline-first', 'Invoice Engine'],
+    isFeatured: false,
+    details: [
+      'Created an offline billing app with digital receipt generation, inventory logging, and sales analysis.',
+      'Exported PDF invoices and daily summaries.',
+    ],
+    tech: ['Flutter', 'Hive DB', 'PDF Generator'],
   ),
 ];

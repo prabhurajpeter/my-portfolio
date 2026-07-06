@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:protfolio/widgets/app_selection_area.dart';
 import 'package:protfolio/widgets/glass_card.dart';
 
@@ -71,19 +72,19 @@ class ServicesSection extends StatelessWidget {
                     ? Column(
                         children: const [
                           _ServiceCard(
-                            icon: Icons.phone_android,
+                            icon: Icons.phone_iphone_rounded,
                             title: "Mobile App Development",
                             desc: "Building cross-platform mobile apps using Flutter with clean code and powerful performance.",
                           ),
                           SizedBox(height: 24),
                           _ServiceCard(
-                            icon: Icons.brush,
+                            icon: Icons.palette_rounded,
                             title: "UI/UX Design",
                             desc: "Designing intuitive and engaging interfaces that provide great user experiences.",
                           ),
                           SizedBox(height: 24),
                           _ServiceCard(
-                            icon: Icons.build,
+                            icon: Icons.psychology_rounded,
                             title: "Problem Solving",
                             desc: "Solving complex problems with efficient solutions and clean architecture.",
                           ),
@@ -93,7 +94,7 @@ class ServicesSection extends StatelessWidget {
                         children: const [
                           Expanded(
                             child: _ServiceCard(
-                              icon: Icons.phone_android,
+                              icon: Icons.phone_iphone_rounded,
                               title: "Mobile App Development",
                               desc: "Building cross-platform mobile apps using Flutter with clean code and powerful performance.",
                             ),
@@ -101,7 +102,7 @@ class ServicesSection extends StatelessWidget {
                           SizedBox(width: 24),
                           Expanded(
                             child: _ServiceCard(
-                              icon: Icons.brush,
+                              icon: Icons.palette_rounded,
                               title: "UI/UX Design",
                               desc: "Designing intuitive and engaging interfaces that provide great user experiences.",
                             ),
@@ -109,7 +110,7 @@ class ServicesSection extends StatelessWidget {
                           SizedBox(width: 24),
                           Expanded(
                             child: _ServiceCard(
-                              icon: Icons.build,
+                              icon: Icons.psychology_rounded,
                               title: "Problem Solving",
                               desc: "Solving complex problems with efficient solutions and clean architecture.",
                             ),

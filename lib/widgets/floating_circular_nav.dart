@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../features/navigation/bloc/navigation_bloc.dart';
 import '../features/navigation/bloc/navigation_state.dart';
 
@@ -45,7 +47,7 @@ class FloatingCircularNav extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(_navItems.length, (i) {
-                    final selected = state.index == i;
+                    final selected = _getNavIndexForSection(state.index) == i;
                     final item = _navItems[i];
 
                     return Tooltip(
@@ -101,12 +103,19 @@ class _NavItem {
   const _NavItem(this.icon, this.label);
 }
 
-const _navItems = [
-  _NavItem(Icons.home, "Home"),
-  _NavItem(Icons.person, "About Me"),
-  _NavItem(Icons.code, "Skills & Stack"),
-  _NavItem(Icons.work, "Experience"),
-  _NavItem(Icons.folder, "Featured Projects"),
-  _NavItem(Icons.school, "Education"),
-  _NavItem(Icons.mail, "Contact"),
+const _navIndices = [0, 1, 4, 3, 5, 6, 7];
+
+int _getNavIndexForSection(int sectionIndex) {
+  if (sectionIndex == 2) return 1; // Map ServicesSection (Index 2) to About (Index 1)
+  return _navIndices.indexOf(sectionIndex);
+}
+
+const List<_NavItem> _navItems = [
+  _NavItem(Icons.home_rounded, "Home"),
+  _NavItem(Icons.person_outline_rounded, "About"),
+  _NavItem(Icons.code_rounded, "Skills"),
+  _NavItem(Icons.folder_rounded, "Projects"),
+  _NavItem(Icons.work_history_rounded, "Experience"),
+  _NavItem(Icons.school_rounded, "Education"),
+  _NavItem(Icons.mail_outline_rounded, "Contact"),
 ];

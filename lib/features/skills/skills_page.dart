@@ -352,7 +352,7 @@ class _RocketIllustrationState extends State<_RocketIllustration>
 
     return AnimatedBuilder(
       animation: _bob,
-      builder: (_, __) => Transform.translate(
+      builder: (_, _) => Transform.translate(
         offset: Offset(0, _bob.value),
         child: SizedBox(
           width: 110,

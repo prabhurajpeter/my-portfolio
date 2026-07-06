@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:protfolio/core/navigation_notification.dart';
 import 'package:protfolio/widgets/app_selection_area.dart';
 
@@ -233,11 +234,11 @@ class _VerticalStatCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Column(
       children: [
-        _StatCard(icon: Icons.calendar_today_rounded, iconColor: Color(0xFF7C3AED), number: '2.8+', label: 'Years Experience'),
+        _StatCard(icon: Icons.timer_rounded, iconColor: Color(0xFF7C3AED), number: '2.8+', label: 'Years Experience'),
         SizedBox(height: 12),
-        _StatCard(icon: Icons.grid_view_rounded, iconColor: Color(0xFF7C3AED), number: '10+', label: 'Projects Completed'),
+        _StatCard(icon: Icons.check_circle_rounded, iconColor: Color(0xFF7C3AED), number: '10+', label: 'Projects Completed'),
         SizedBox(height: 12),
-        _StatCard(icon: Icons.emoji_events_rounded, iconColor: Color(0xFF7C3AED), number: '5+', label: 'Happy Clients'),
+        _StatCard(icon: Icons.sentiment_satisfied_alt_rounded, iconColor: Color(0xFF7C3AED), number: '5+', label: 'Happy Clients'),
         SizedBox(height: 12),
         _StatCard(icon: Icons.favorite_rounded, iconColor: Color(0xFF7C3AED), number: '100%', label: 'Commitment'),
       ],
@@ -417,7 +418,7 @@ class _TerminalCardState extends State<_TerminalCard>
                   ),
                   AnimatedBuilder(
                     animation: _cursorController,
-                    builder: (_, __) => Opacity(
+                    builder: (_, _) => Opacity(
                       opacity: _cursorController.value,
                       child: const Text('_',
                           style: TextStyle(
@@ -548,11 +549,11 @@ class _BrandIconsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icons = [
-      _BIcon(icon: Icons.flutter_dash, color: const Color(0xFF54C5F8), tooltip: 'Flutter'),
-      _BIcon(icon: Icons.code, color: const Color(0xFF00B4AB), tooltip: 'Dart'),
-      _BIcon(icon: Icons.design_services_rounded, color: const Color(0xFFF24E1E), tooltip: 'Figma'),
-      _BIcon(icon: Icons.local_fire_department_rounded, color: const Color(0xFFFFA000), tooltip: 'Firebase'),
-      _BIcon(icon: Icons.merge_type, color: const Color(0xFFFF5722), tooltip: 'Git'),
+      _BIcon(icon: 'assets/icons/flutter.png', color: const Color(0xFF54C5F8), tooltip: 'Flutter'),
+      _BIcon(icon: 'assets/icons/dart.png', color: const Color(0xFF00B4AB), tooltip: 'Dart'),
+      _BIcon(icon: 'assets/icons/figma.png', color: const Color(0xFFF24E1E), tooltip: 'Figma'),
+      _BIcon(icon: 'assets/icons/firebase.png', color: const Color(0xFFFFA000), tooltip: 'Firebase'),
+      _BIcon(icon: 'assets/icons/gitalt.png', color: const Color(0xFFFF5722), tooltip: 'Git'),
       _BIcon(icon: Icons.favorite_rounded, color: const Color(0xFF7C3AED), tooltip: 'Open Source'),
     ];
 
@@ -565,7 +566,7 @@ class _BrandIconsRow extends StatelessWidget {
 }
 
 class _BIcon {
-  final IconData icon;
+  final dynamic icon;
   final Color color;
   final String tooltip;
   const _BIcon({required this.icon, required this.color, required this.tooltip});
@@ -616,12 +617,35 @@ class _BIconBtnState extends State<_BIconBtn> {
                   ]
                 : [],
           ),
-          child: Icon(
-            widget.data.icon,
-            color: _hovered
-                ? widget.data.color
-                : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-            size: 24,
+          child: Center(
+            child: widget.data.icon is String
+                ? (widget.data.icon.toString().endsWith('.svg')
+                    ? SvgPicture.asset(
+                        widget.data.icon as String,
+                        width: 24,
+                        height: 24,
+                        colorFilter: _hovered
+                            ? null
+                            : ColorFilter.mode(
+                                theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                BlendMode.srcIn,
+                              ),
+                      )
+                    : Image.asset(
+                        widget.data.icon as String,
+                        width: 24,
+                        height: 24,
+                        color: _hovered
+                            ? null
+                            : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ))
+                : Icon(
+                    widget.data.icon as IconData,
+                    color: _hovered
+                        ? widget.data.color
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 24,
+                  ),
           ),
         ),
       ),
